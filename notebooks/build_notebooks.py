@@ -404,7 +404,7 @@ NOTEBOOKS["03_draft.ipynb"] = [
     md("""
 # MLB Draft
 
-Two layers: the Baseball Almanac history (1965-2025, names and schools) and the
+Two layers: the Baseball Almanac history (1965-2026, names and schools) and the
 MLB Stats API detail (2021-2026, with signing bonuses, slot values, school class
 and biography). Plus MLB Pipeline's pre-draft prospect rankings.
 
@@ -420,7 +420,7 @@ Covers: `parse_mlb_draft`, `get_drafted_players_mlb`,
     code("""
 from ncaa_bbStats import *
 """),
-    md("## Draft history, 1965-2025"),
+    md("## Draft history, 1965-2026"),
     code("""
 # Everyone a club drafted in one year
 picks = get_drafted_players_mlb("Boston Red Sox", 2025)
@@ -435,7 +435,7 @@ print_draft_picks_college(picks)
 """),
     code("""
 all_picks = get_drafted_players_all_years_college("Northeastern")
-print(f"{len(all_picks)} Northeastern players drafted, 1965-2025")
+print(f"{len(all_picks)} Northeastern players drafted, 1965-2026")
 
 club = get_drafted_players_all_years_mlb("Boston Red Sox")
 print(f"{len(club)} players drafted by the Red Sox, all years")
@@ -978,7 +978,7 @@ print(f"\\nstage 2 ({stage2['units']}): {stage2['base']:.1f} -> "
 # feature_row that predict_from_stats scored, so the explanation and the number
 # come from one row rather than two.
 scored = predict_from_stats(
-    "pitcher", 21,
+    "pitcher", "Jr",
     {"era_pitch": 2.40, "so_pitch": 130, "bb_pitch": 25, "ip_pitch": 95.0},
     team="LSU", season=2025,
 )
@@ -1027,9 +1027,9 @@ which the models handle natively, and the result reports how much was imputed.
 """),
     code("""
 result = predict_from_stats(
-    "pitcher", age=21,
-    stats={"era": 2.40, "so": 130, "bb": 25, "ip": 95.0,
-           "h": 68, "hr": 5, "g": 16, "gs": 16, "tbf": 370},
+    "pitcher", "Jr",
+    {"era": 2.40, "so": 130, "bb": 25, "ip": 95.0,
+     "h": 68, "hr": 5, "g": 16, "gs": 16, "tbf": 370},
     team="LSU", name="Prospect A",   # season defaults to the most recent
 )
 print(result["report"])
@@ -1043,18 +1043,18 @@ print("predicted order:", result["predicted_order"])
     code("""
 # A weaker line, with no team given -- context falls back to the season median
 weak = predict_from_stats(
-    "batter", age=19,
-    stats={"avg": 0.240, "hr": 1, "pa": 90, "ab": 80},
+    "batter", "Fr",
+    {"avg": 0.240, "hr": 1, "pa": 90, "ab": 80},
     name="Prospect B",   # no team either: context falls back to the league median
 )
 print(weak["report"])
 """),
     code("""
-# The model responds to the input: same role and age, different production
-strong = predict_from_stats("pitcher", 21,
+# The model responds to the input: same role and class, different production
+strong = predict_from_stats("pitcher", "Jr",
     {"era": 1.80, "so": 150, "bb": 15, "ip": 100.0, "h": 60, "hr": 3,
      "g": 16, "gs": 16}, team="LSU")
-poor = predict_from_stats("pitcher", 21,
+poor = predict_from_stats("pitcher", "Jr",
     {"era": 7.50, "so": 12, "bb": 20, "ip": 18.0, "h": 30, "hr": 6,
      "g": 9, "gs": 1}, team="LSU")
 
@@ -1071,11 +1071,14 @@ limitations travel with the predictions.
 """),
     code("""
 card = model_card()
-print(f"version    : {card['model_version']}")
-print(f"trained on : {card['train_years']}")
-print(f"tested on  : {card['test_year']}")
-print(f"eligibility: {card['eligibility']}")
+print(f"version     : {card['model_version']}")
+print(f"scored years: {card['scored_years']}")
+print(f"validation  : {card['validation']['scheme']}, "
+      f"folds {card['validation']['folds']}")
+print(f"eligibility : {card['eligibility']['rules']['class']}")
 
+# Every figure below is out-of-fold -- a season is scored only by the model that
+# did not train on it.
 print(f"\\nstage 1 (drafted or not): {card['stage1']['metrics']}")
 print(f"stage 2 (draft order)   : {card['stage2']['metrics']}")
 """),

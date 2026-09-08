@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import requests
 from bs4 import BeautifulSoup
@@ -8,12 +9,23 @@ os.makedirs(BASE_DIR, exist_ok=True)
 
 COLUMN_NAMES = ["Round", "Pick", "Phase", "Player Name", "Drafted By", "POS", "Drafted From"]
 
+def _clean(text: str) -> str:
+    """Collapse the newlines Baseball Almanac embeds mid-cell from 2026 on.
+
+    Earlier seasons' markup keeps each cell on one line, so this is a no-op
+    there and the whole cache stays in one format.
+    """
+    text = " ".join(text.split())
+    text = re.sub(r"\(\s+", "(", text)
+    return re.sub(r"\s+\)", ")", text)
+
+
 def parse_mlb_draft(year: int) -> list[dict]:
     """
     Parses MLB Draft data for a given year from Baseball Almanac.
 
     Args:
-        year (int): The year of the MLB draft to parse. Must be between 1965 and 2025.
+        year (int): The year of the MLB draft to parse. Must be between 1965 and 2026.
 
     Returns:
         list[dict]: A list of dictionaries, each representing a single draft pick
@@ -25,8 +37,8 @@ def parse_mlb_draft(year: int) -> list[dict]:
         requests.exceptions.RequestException: If there is an issue fetching the webpage.
     """
 
-    if not (1965 <= year <= 2025):
-        raise ValueError("Year must be between 1965 and 2025")
+    if not (1965 <= year <= 2026):
+        raise ValueError("Year must be between 1965 and 2026")
 
     url = f"https://www.baseball-almanac.com/draft/baseball-draft.php?yr={year}"
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -43,7 +55,7 @@ def parse_mlb_draft(year: int) -> list[dict]:
 
     draft_picks = []
     for row in data_rows:
-        cols = [td.get_text(strip=True) for td in row.find_all("td")]
+        cols = [_clean(td.get_text(strip=True)) for td in row.find_all("td")]
         if len(cols) != 7:
             continue  # Skip malformed rows
         record = dict(zip(COLUMN_NAMES, cols))
@@ -53,13 +65,13 @@ def parse_mlb_draft(year: int) -> list[dict]:
     return draft_picks
 
 
-def save_yearly_drafts(start_year=1965, end_year=2025):
+def save_yearly_drafts(start_year=1965, end_year=2026):
     """
     Parses and saves MLB Draft data for each year in the given range to individual JSON files.
 
     Args:
         start_year (int, optional): The first year to parse. Defaults to 1965.
-        end_year (int, optional): The last year to parse. Defaults to 2025.
+        end_year (int, optional): The last year to parse. Defaults to 2026.
 
     Side Effects:
         Creates a directory `mlb_draft_cache` (if not already present) in the `data` folder.
@@ -81,13 +93,13 @@ def save_yearly_drafts(start_year=1965, end_year=2025):
             print(f"Skipped {year} due to error: {e}")
 
 
-def save_combined_draft(start_year=1965, end_year=2025, output_file="all_drafts.json"):
+def save_combined_draft(start_year=1965, end_year=2026, output_file="all_drafts.json"):
     """
     Parses MLB Draft data for a range of years and saves all draft picks to a single JSON file.
 
     Args:
         start_year (int, optional): The first year to include. Defaults to 1965.
-        end_year (int, optional): The last year to include. Defaults to 2025.
+        end_year (int, optional): The last year to include. Defaults to 2026.
         output_file (str, optional): The name of the combined JSON output file. Defaults to "all_drafts.json".
 
     Side Effects:

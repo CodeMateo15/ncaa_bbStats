@@ -2,7 +2,7 @@
 
 Adds the detail the Baseball Almanac cache does not carry: signing bonuses,
 published slot values, school class, and player biography. Covers 2021-2026;
-:mod:`ncaa_bbStats.utils` remains the way to reach 1965-2025 draft history.
+:mod:`ncaa_bbStats.utils` remains the way to reach 1965-2026 draft history.
 """
 
 import json

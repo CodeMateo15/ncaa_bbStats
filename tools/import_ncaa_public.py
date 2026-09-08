@@ -26,9 +26,15 @@ the existing cache carries cannot be sourced publicly at all:
   DOB for college players anywhere, so this column is empty here. It is a model
   feature (``features.BIO_FEATURES``), so swapping the default source without
   retraining would quietly feed the model an all-null feature.
-* **2026** -- the upstream NCAA mirrors stopped updating on 2026-04-12, mid-season,
-  so their 2026 holds roughly 60% of a season. Coverage here is 2021-2025, while
-  the existing cache runs 2021-2026 and the draft app defaults to 2026.
+* **five pitching columns in 2026** -- ``w``, ``l``, ``cg``, ``sho`` and ``sv`` are
+  absent from the upstream 2026 scrape for all 5,402 rows. Nothing this package
+  computes reads them, but they are model features, so swapping the default source
+  without retraining would feed the model five empty columns for the newest season.
+  (Batting ``gdp`` is likewise absent for 2026, as it already was for 2021.)
+
+2026 itself is now here: the mirrors froze mid-season on 2026-04-12, so it comes
+from the research repo's direct scrape of stats.ncaa.org instead. Coverage is
+2021-2026, matching the existing cache.
 
 So the old cache stays exactly where it is and stays the default. This one is
 opt-in via ``load_player_frame(..., source="ncaa")`` until the models are retrained
@@ -148,7 +154,7 @@ def build(stat_type, source_dir, names, team_games):
         raise SystemExit(
             f"missing {path}\nBuild it first:\n"
             f"  cd <research repo>/CSV+Code Files/ncaa_scraper\n"
-            f"  python run.py --years 2021-2025")
+            f"  python run.py --years 2021-2026")
     frame = pd.read_csv(path, low_memory=False)
     frame.columns = [c.strip() for c in frame.columns]
 
@@ -241,6 +247,12 @@ def upstream_provenance(source_dir):
             for alias, entry in sorted(resolved.items())
         },
         "files": len(manifest.get("files", {})),
+        # Stated because the pinned commits above do not cover the whole cache:
+        # both mirrors froze on 2026-04-12 holding mid-season files, so 2026 was
+        # scraped from stats.ncaa.org directly and has no commit to pin. The
+        # `source_sha256` recorded per dataset pins the bytes actually imported.
+        "coverage": "the pinned commits supply 2021-2025; 2026 comes from the "
+                    "research repo's direct scrape of stats.ncaa.org",
     }
 
 

@@ -145,6 +145,8 @@ def test_readme_names_only_real_functions():
         "eada_year", "significant", "coverage", "confidence", "report",
         # Column names, discussed as data rather than called as functions.
         "age", "class",
+        # Pitching counts the NCAA-sourced cache lacks for 2026.
+        "w", "l", "cg", "sho", "sv",
     }
     named = set(re.findall(r"`([a-z_][a-z0-9_]*)`", readme))
     missing = sorted(

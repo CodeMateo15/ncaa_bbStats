@@ -8,7 +8,7 @@ Functions
 
 .. py:function:: parse_mlb_draft(year: int) -> list[dict]:
 
-    Parses MLB draft results from Baseball Almanac for a given year (1965–2025).
+    Parses MLB draft results from Baseball Almanac for a given year (1965–2026).
 
     :param year: Year of the draft.
     :return: List of drafted player details.

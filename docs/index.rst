@@ -5,7 +5,7 @@ ncaa_bbStats documentation
 **ncaa_bbStats** is an open-source NCAA baseball analysis package for Python.
 
 It covers NCAA Division I, II, and III team statistics (2002-2026), player
-statistics (2021-2025), MLB Draft history (1965-2025), draft detail with
+statistics (2021-2026), MLB Draft history (1965-2026), draft detail with
 signing bonuses and slot values (2021-2026), RPI and schedule strength, program
 finances, and a draft-prediction model with scouting reports.
 

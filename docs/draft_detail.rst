@@ -7,7 +7,7 @@ Overview
 --------
 
 Adds the detail the Baseball Almanac cache does not carry. Covers 2021-2026;
-:doc:`mlb_draft` remains the way to reach 1965-2025 draft history.
+:doc:`mlb_draft` remains the way to reach 1965-2026 draft history.
 
 Each pick records the signing bonus, the published slot value, school and class
 (``"4YR JR"``, ``"JC J2"``), birth date, height, weight, position, handedness,

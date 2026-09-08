@@ -143,8 +143,21 @@ def test_ncaa_cache_has_no_third_party_provenance(stat_type):
         "age is unexpectedly populated in the NCAA cache -- if a public "
         "date-of-birth source now exists, reconsider DEFAULT_SOURCE in "
         "player_utils.py rather than just relaxing this test")
-    assert sorted(df["year"].unique()) == [2021, 2022, 2023, 2024, 2025], (
-        "coverage changed; the upstream mirrors stopped updating mid-2026")
+    assert sorted(df["year"].unique()) == [2021, 2022, 2023, 2024, 2025, 2026], (
+        "coverage changed; expected 2021-2026")
+
+    # 2026 does not come from the mirrors -- they froze on 2026-04-12 holding a
+    # mid-season file. It was scraped from stats.ncaa.org directly. Importing
+    # the frozen mirror by mistake is what this catches, and a row count alone
+    # would not: the mirror carries nearly every player, just with a third of
+    # their playing time missing.
+    volume = "ab" if stat_type == "batting" else "tbf"
+    per_season = df.groupby("year")[volume].mean()
+    baseline = per_season.loc[2021:2025].mean()
+    assert per_season.loc[2026] > 0.85 * baseline, (
+        f"2026 mean {volume} is {per_season.loc[2026]:.1f} against a 2021-2025 "
+        f"baseline of {baseline:.1f} -- this looks like the frozen mid-season "
+        "mirror rather than the live scrape")
 
 
 @pytest.mark.parametrize("stat_type", ["batting", "pitching"])

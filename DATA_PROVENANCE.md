@@ -8,16 +8,16 @@ it is redistributed. If you are adding a dataset, add a row here first.
 | Dataset | Path | Source | Terms | Coverage |
 | --- | --- | --- | --- | --- |
 | NCAA team statistics | `src/data/team_stats_cache/div{1,2,3}/{year}.json` | [stats.ncaa.org](https://stats.ncaa.org) national rankings tables, scraped by `ncaa_bbStats.team_stats` | Official NCAA statistics; factual game records | 2002–2026, Divisions I–III |
-| MLB draft history | `src/data/mlb_draft_cache/*.json` | [Baseball Almanac](https://www.baseball-almanac.com), scraped by `ncaa_bbStats.draft_stats` | Factual draft records | 1965–2025, 69,169 picks |
+| MLB draft history | `src/data/mlb_draft_cache/*.json` | [Baseball Almanac](https://www.baseball-almanac.com), scraped by `ncaa_bbStats.draft_stats` | Factual draft records | 1965–2026, 69,781 picks |
 | Player statistics | `src/data/player_stats_cache/{batting,pitching}/*.csv` | See **FanGraphs** below | Counting statistics only; see below | 2021–2026, Division I |
-| Player statistics, NCAA-sourced | `src/data/player_stats_cache_ncaa/{batting,pitching}/*.csv` | See **NCAA player statistics** below | Counting statistics only, with no third-party export anywhere in the chain | 2021–2025, Division I |
+| Player statistics, NCAA-sourced | `src/data/player_stats_cache_ncaa/{batting,pitching}/*.csv` | See **NCAA player statistics** below | Counting statistics only, with no third-party export anywhere in the chain | 2021–2026, Division I |
 | League constants | `src/data/league_constants/*.csv` | Regressed from `team_stats_cache` by `tools/build_league_constants.py` | Package's own work | 2008–2026 (D-III from 2009) |
 | Team registry | `src/data/registry/*.csv` | Built from the caches above plus IPEDS unitids by `tools/build_team_registry.py` | Package's own work; IPEDS identifiers are U.S. federal public domain | 1,023 programs, 2002–2026 |
 | MLB draft detail | `src/data/draft_detail/{year}.json` | [MLB Stats API](https://statsapi.mlb.com/api/v1/draft/), fetched by `ncaa_bbStats.draft_detail_store` | Public MLB Advanced Media API; factual draft records | 2021–2026, 3,685 picks |
 | RPI / strength of schedule | `src/data/rpi/{year}.csv` | [Warren Nolan](https://www.warrennolan.com), converted by `ncaa_bbStats.rpi_store` | Third-party computation, not official NCAA; factual records | 2021–2026, Division I |
 | Program finances | `src/data/program_finance/eada_features.csv` | [EADA survey](https://ope.ed.gov/athletics/#/datafile/list), U.S. Dept. of Education, derived by `ncaa_bbStats.program_store` | U.S. federal government work; public domain | 2021–2025, carried forward to 2026 |
 | Draft prospect rankings | `src/data/prospects/{year}.csv` | MLB Pipeline top-250, converted by `ncaa_bbStats.prospect_store` | Third-party rankings, attributed | 2021–2026, 250/year |
-| Player registry | `src/data/player_registry/*.csv` | Resolved from the player cache, anchored to the MLB Stats API by `tools/build_player_registry.py` | Package's own work | 27,283 players, 2021–2025 |
+| Player registry | `src/data/player_registry/*.csv` | Resolved from the player cache, anchored to the MLB Stats API by `tools/build_player_registry.py` | Package's own work | 29,743 players over 61,279 player-seasons, 2021–2026 |
 | Public model matrix | `src/data/public_matrix/batting_pitching_combined_with_rpi_public_v2_nomin.csv.gz` | Built by the research repo's `csv_editing_scripts/build_public_combined.py` from NCAA-published player statistics, NCAA team statistics, Warren Nolan RPI and the EADA survey | Every input redistributable; no third-party export anywhere in the chain | 2021–2026, Division I, 61,270 player-seasons, no playing-time minimum, no eligibility filter |
 | Draft models | `src/data/models/*` | Trained by `ncaa_bbStats.model_store` on the public model matrix above | Package's own work | 2021–2026, leave-one-season-out |
 | Pythagorean exponents | `src/data/pythagorean/conference_exponents.csv` | Fitted to NCAA team-season data | Package's own work | 31 conferences; **experimental** |
@@ -68,7 +68,7 @@ is nothing to buy with the filter and a quarter of the positive class to lose.
 ## NCAA player statistics
 
 `src/data/player_stats_cache_ncaa/` is the re-sourcing the **FanGraphs** section
-below has listed as planned since 1.2.0, and it has now landed for 2021–2025.
+below has listed as planned since 1.2.0, and it has now landed for 2021–2026.
 Nothing in it passed through a FanGraphs export at any point.
 
 **Where it came from.** NCAA's own published season statistics, obtained from two
@@ -81,6 +81,24 @@ mutable and a citation to one is not reproducible:
 | --- | --- | --- |
 | [`armstjc/ncaa_baseball_data`](https://github.com/armstjc/ncaa_baseball_data) | `db15ad2302193a1e805452bc52e69c6af56e1df7` | season statistics 2022–2025, rosters 2021–2025 |
 | [`armstjc/NCAA_Baseball_repository`](https://github.com/armstjc/NCAA_Baseball_repository) | `fc754475a065642fade082205c8d8734a11fab42` | 2021, and the 2022 programs the first mirror lacks |
+
+**2026 is not mirrored.** Both mirrors froze on 2026-04-12 holding mid-season
+files, so 2026 was scraped from `stats.ncaa.org` directly by the research repo —
+the same live scrape the public model matrix uses, covering all 308 Division I
+team-seasons at full-season volume (mean 106.5 at-bats against 105.2 in 2025).
+`tests/test_data_integrity.py` asserts that volume, so re-importing the frozen
+mirror by mistake fails rather than passing quietly with a third of the playing
+time missing.
+
+Two gaps come with it, both upstream omissions rather than choices made here:
+
+* **Pitching `w`, `l`, `cg`, `sho`, `sv` are empty for 2026** — all 5,402 rows.
+  No rate or run-value metric reads them (`era`, `whip`, `cfip`, `clob%` and the
+  rest derive from `ip`, `tbf`, `h`, `er`, `hr`, `bb`, `so`), so everything this
+  package computes is unaffected. They are model features, which is part of why
+  this cache is not yet the default.
+* **Batting `gdp` is empty for 2026**, as it already is for 2021. Nothing
+  derives from it.
 
 Both are © their author and published without an explicit data licence; the
 underlying statistics are NCAA's factual game records, which is the basis for
@@ -179,15 +197,14 @@ But their *provenance in this package* is still a FanGraphs export, even though
 the underlying facts are not FanGraphs'.
 
 **That re-sourcing has now partly landed.** `src/data/player_stats_cache_ncaa/`
-holds the same statistics for 2021–2025 taken from NCAA's own published season
+holds the same statistics for 2021–2026 taken from NCAA's own published season
 data, with no FanGraphs export in the chain, reproducing this cache at r ≥ 0.998
 on every column including the package's own derived metrics — see **NCAA player
-statistics** above. It is not yet the default, because it cannot supply `age` or
-the 2026 season.
+statistics** above. It is not yet the default, because it cannot supply `age`,
+and its 2026 pitching rows are missing five decision and appearance counts.
 
 So this section remains the accurate description of where the *default* numbers
-come from, and will until the models are retrained on the NCAA-sourced cache and
-2026 is obtained another way.
+come from, and will until the models are retrained on the NCAA-sourced cache.
 
 **Team names are not FanGraphs'.** The `team name` column is filled from
 `src/data/registry/teams.csv` (`canonical_name`), not from the vendor export.

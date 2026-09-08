@@ -1,7 +1,7 @@
 """Retrieval and analysis of NCAA college baseball statistics.
 
-Team stats (Divisions I-III, 2002-2026), player stats (2021-2025), and MLB draft
-history (1965-2025). See https://collegebaseballstatspackage.readthedocs.io.
+Team stats (Divisions I-III, 2002-2026), player stats (2021-2026), and MLB draft
+history (1965-2026). See https://collegebaseballstatspackage.readthedocs.io.
 
 Names are re-exported flat, so ``from ncaa_bbStats import get_team_stat`` works.
 Submodules are also importable directly (``ncaa_bbStats.player_utils``) for

@@ -134,7 +134,7 @@ def load_player_frame(
         stat_type (str): ``"batting"`` or ``"pitching"``.
         qualifier (str): ``"qualified"`` or ``"noMin"``.
         source (str): ``"fangraphs"`` (default) or ``"ncaa"`` for the
-            NCAA-sourced cache, which covers 2021-2025 and has an empty ``age``
+            NCAA-sourced cache, which covers 2021-2026 and has an empty ``age``
             column. See DATA_PROVENANCE.md.
 
     Returns:

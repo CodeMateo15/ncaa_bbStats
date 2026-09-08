@@ -4,7 +4,7 @@
 
 **ncaa_bbStats** is an open-source Python package for retrieving, parsing, and
 analyzing college baseball data: NCAA Division I, II, and III team statistics
-(2002–2026), player statistics (2021–2026), MLB Draft history (1965–2025),
+(2002–2026), player statistics (2021–2026), MLB Draft history (1965–2026),
 draft detail with signing bonuses (2021–2026), RPI and schedule strength,
 program finances, and a draft-prediction model with scouting reports.
 
@@ -83,13 +83,13 @@ print(scouting_report("Kade Anderson", 2025))
 | --- | --- |
 | NCAA team statistics | 2002–2026, Divisions I–III |
 | Player statistics | 2021–2026, Division I |
-| MLB Draft history | 1965–2025, 69,169 picks |
+| MLB Draft history | 1965–2026, 69,781 picks |
 | MLB Draft detail (bonuses, slots, biography) | 2021–2026, 3,685 picks |
 | RPI, strength of schedule, quadrant records | 2021–2026, Division I |
 | Program finances ([EADA](https://ope.ed.gov/athletics/#/datafile/list)) | 2021–2025, carried forward to 2026 |
 | Draft prospect rankings | 2021–2026 |
 | Team registry | 1,023 programs |
-| Player registry | 27,283 players |
+| Player registry | 29,743 players over 61,279 player-seasons, 2021–2026 (no playing-time minimum) |
 
 ---
 
@@ -137,7 +137,7 @@ aggregation that rebuilds rates from summed components.
 
 ### Draft
 `parse_mlb_draft`, `get_drafted_players_mlb`, `get_drafted_players_college`,
-`print_draft_picks_mlb`, `print_draft_picks_college` (1965–2025)
+`print_draft_picks_mlb`, `print_draft_picks_college` (1965–2026)
 
 `draft_pick`, `draft_class`, `draft_history`, `slot_value`, `signing_bonus`,
 `bonus_vs_slot`, `overslot_picks`, `biggest_bonuses`, `draft_demographics`,
@@ -235,13 +235,14 @@ python -m pytest tests/ -q
 ## Planned
 
 - Player statistics re-sourced from NCAA's own published data — **partly done.**
-  `src/data/player_stats_cache_ncaa/` covers 2021–2025 with no third-party export
+  `src/data/player_stats_cache_ncaa/` covers 2021–2026 with no third-party export
   anywhere in the chain, and reproduces the default cache at r ≥ 0.998 on every
   column including this package's derived metrics. Read it with
   `load_player_frame(..., source="ncaa")`. It is not the default yet because NCAA
-  publishes no date of birth (so `age` is empty) and the upstream mirrors stopped
-  updating mid-2026. Promoting it needs a retrain, a registry rebuild, and another
-  route to 2026 — see [DATA_PROVENANCE.md](DATA_PROVENANCE.md)
+  publishes no date of birth (so `age` is empty), and its 2026 pitching rows
+  carry no `w`, `l`, `cg`, `sho` or `sv` — the upstream scrape did not collect
+  them. Promoting it needs a retrain and a registry rebuild — see
+  [DATA_PROVENANCE.md](DATA_PROVENANCE.md)
 - IPEDS identifiers backfilled for Division II and III programs
 - Team game results with win-loss tracking
 - Park factors, which currently limit `cwrc_plus`

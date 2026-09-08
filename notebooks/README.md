@@ -11,7 +11,7 @@ These are **examples, not tests**. The test suite is `tests/`, run with
 | --- | --- |
 | `01_team_stats.ipynb` | Team statistics, the team registry, Pythagorean expectation and luck ratings |
 | `02_player_stats.ipynb` | Player seasons, the derived advanced metrics, leaderboards |
-| `03_draft.ipynb` | Draft history 1965–2025, draft detail with bonuses 2021–2026, prospect rankings |
+| `03_draft.ipynb` | Draft history 1965–2026, draft detail with bonuses 2021–2026, prospect rankings |
 | `04_rpi_and_program_finance.ipynb` | RPI, schedule strength, quadrant records, EADA program finances |
 | `05_cross_dataset.ipynb` | Questions needing several datasets at once |
 | `06_scouting.ipynb` | Draft predictions, explanations, scouting reports |
